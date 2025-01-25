@@ -16,7 +16,7 @@ public class SpringRabbitListener {
     }
 
     /**
-     * rabbitMQ-work模型的使用
+     * rabbitMQ-work模型的使用: 让多个消费者绑定到一个队列,共同消费队列中的消息
      * 当一个队列有多个消费者消费时,可以加快处理消息的速度
      * 但是这时消息只会轮询给每个消费者,但是work模型需要实现能者多劳的情景
      * 加上perfetch配置,让消费者消费完一条消息才能继续消费消息,这样就可以实现能者多劳
@@ -31,5 +31,60 @@ public class SpringRabbitListener {
     private void listenerWorkMessage2(String message) throws InterruptedException {
         log.error("监听到消费者2 中发送的消息: {}", message);
         Thread.sleep(200);
+    }
+
+    /**
+     * fanout广播
+     * @param message
+     */
+    @RabbitListener(queues = "fanout.queue1")
+    private void listenerFanoutQueue2Message(String message) {
+        log.info("收到了fanout.queue1的消息: {}", message);
+    }
+    /**
+     * fanout广播
+     * @param message
+     */
+    @RabbitListener(queues = "fanout.queue2")
+    private void listenerFanoutQueue1Message(String message) {
+        log.info("收到了fanout.queue2的消息: {}", message);
+    }
+
+    /**
+     * direct按需投放消息
+     * @param message
+     */
+    @RabbitListener(queues = "direct.queue1")
+    private void listenerDirectQueue1Message(String message) {
+        log.info("收到了direct.queue1的消息: {}", message);
+    }
+    /**
+     * direct按需投放消息
+     * @param message
+     */
+    @RabbitListener(queues = "direct.queue2")
+    private void listenerDirectQueue2Message(String message) {
+        log.info("收到了direct.queue2的消息: {}", message);
+    }
+
+    /**
+     * topic按需投放消息
+     * 可以使用多个单词指定routing,使用.分隔,可以使用通配符指定routingKey的名称
+     * #可以代表0个或者多个单词, *代表一个单词
+     * @param message
+     */
+    @RabbitListener(queues = "topic.queue1")
+    private void listenerTopicQueue1Message(String message) {
+        log.info("收到了topic.queue1的消息: {}", message);
+    }
+    /**
+     * topic按需投放消息
+     * 可以使用多个单词指定routing,使用.分隔,可以使用通配符指定routingKey的名称
+     * #可以代表0个或者多个单词, *代表一个单词
+     * @param message
+     */
+    @RabbitListener(queues = "topic.queue2")
+    private void listenerTopicQueue2Message(String message) {
+        log.info("收到了topic.queue2的消息: {}", message);
     }
 }
