@@ -1,0 +1,13 @@
+server:
+  port: 8082
+spring:
+  rabbitmq:
+    host: 192.168.80.101
+    port: 5672
+    virtual-host: host1
+    username: jackson
+    password: 123456
+    listener:
+      simple:
+        # 消费者处理完一条再处理下一条
+        prefetch: 1
