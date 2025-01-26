@@ -1,6 +1,10 @@
 package com.jackson.listener;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -86,5 +90,32 @@ public class SpringRabbitListener {
     @RabbitListener(queues = "topic.queue2")
     private void listenerTopicQueue2Message(String message) {
         log.info("收到了topic.queue2的消息: {}", message);
+    }
+
+
+    /**
+     * 使用注解创建队列交换机以及关系,顺便监听消息, 如果已经存在就不会再创建
+     * @param message
+     */
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "direct.queue3",durable = "true"),
+            exchange = @Exchange(name = "jackson.direct2",type = ExchangeTypes.DIRECT),
+            key = {"red","blue"}
+    ))
+    private void genExchangeAndQueue3AndBindingByListener(String message) {
+        log.info("收到了direct.queue3的消息: {}", message);
+    }
+
+    /**
+     * 使用注解创建队列交换机以及关系,顺便监听消息, 如果已经存在就不会再创建
+     * @param message
+     */
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "direct.queue4",durable = "true"),
+            exchange = @Exchange(name = "jackson.direct2",type = ExchangeTypes.DIRECT),
+            key = {"red","yellow"}
+    ))
+    private void genExchangeAndQueue4AndBindingByListener(String message) {
+        log.info("收到了direct.queue4的消息: {}", message);
     }
 }
