@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @SpringBootTest
 public class SpringAMQPTest {
 
@@ -25,6 +28,7 @@ public class SpringAMQPTest {
 
     /**
      * 测试work模型: 多消费者消费消息
+     *
      * @throws InterruptedException
      */
     @Test
@@ -81,10 +85,21 @@ public class SpringAMQPTest {
         // routing名称 -> 通过这个获取需要路由的消息的队列
         // String routingKey = "china.weather";
         // String routingKey = "china.news";
-         String routingKey = "japan.news";
+        String routingKey = "japan.news";
         // 信息
         String message = "日本cs,新闻都是负面的";
         // 广播时queue队列名称给""或者null
         rabbitTemplate.convertAndSend(exchange, routingKey, message);
+    }
+
+    // 发送map类型的消息
+    @Test
+    public void testSendMapMessage() {
+        Map<String, Object> message = new HashMap<>();
+        message.put("name", "jackson");
+        message.put("age", 18);
+        // 这里会使用默认的消息转换器去转换对象值, 默认的消息转换器是通过序列化对象,最终发送的消息是序列化后的结果
+        // 可以通过在消费者以及生产者中声明自己的消息转换器即可修改消息转换器类型,可以使用json格式的消息转换器
+        rabbitTemplate.convertAndSend("object.queue", message);
     }
 }
