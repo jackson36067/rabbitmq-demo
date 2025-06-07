@@ -19,6 +19,9 @@ public class SpringRabbitListener {
         log.info("监听到队列simple.queue中发送的消息: {}", message);
         // 执行中间逻辑
         log.info("消息处理完毕");
+        // 当消费者确认机制改为auto之后, 当监听接收消息时出现异常时会不停的发送消息, 如果服务宕机, 消息也不会消息
+        // 但是如果接收到的消息的格式出现异常, 那么消息就会被直接reject, 消息会被删除
+        throw new RuntimeException("测试消费者确认机制抛出的异常");
     }
 
     /**

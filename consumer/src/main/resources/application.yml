@@ -11,3 +11,10 @@ spring:
       simple:
         # 消费者处理完一条再处理下一条
         prefetch: 1
+        acknowledge-mode: auto #消费者确认机制, auto当代码处理消息业务抛出异常后, 消息不会直接消息
+        retry:
+          enabled: true #开启消费者失败重试机制
+          multiplier: 1 #下载失败后的等待时间倍数,倍数为1,那么每次等待时间都一样
+          initial-interval: 1000ms #初始失败等待时长
+          max-attempts: 3 #最大尝试次数
+          stateless: true #true无状态, 当业务代码中有事务时需要使用false

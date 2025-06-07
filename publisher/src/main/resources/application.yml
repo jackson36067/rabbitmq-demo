@@ -7,3 +7,15 @@ spring:
     virtual-host: host1
     username: jackson
     password: 123456
+    connection-timeout: 1s # 设置mq连接超时时间
+    # 当出现网络波动, mq连接不上时, 配置生产者重连
+    template:
+      retry:
+        enabled: true # 开启超时重试机制
+        initial-interval: 1000ms # 失败后的初始等待时间
+        multiplier: 1 # 每次失败后等待时间是上次的几倍
+        max-attempts: 3 # 最多尝试重连次数
+    #publisher-confirm-type: correlated # 生产者确认消息方式为异步
+    #publisher-returns: true
+    publisher-confirm-type: none # 生产者确认消息方式为异步
+    publisher-returns: false

@@ -1,14 +1,21 @@
 package com.jackson;
 
+import com.jackson.bean.MyCorrelationData;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @SpringBootTest
+@Slf4j
 public class SpringAMQPTest {
 
     @Resource
@@ -101,5 +108,27 @@ public class SpringAMQPTest {
         // 这里会使用默认的消息转换器去转换对象值, 默认的消息转换器是通过序列化对象,最终发送的消息是序列化后的结果
         // 可以通过在消费者以及生产者中声明自己的消息转换器即可修改消息转换器类型,可以使用json格式的消息转换器
         rabbitTemplate.convertAndSend("object.queue", message);
+    }
+
+    @Test
+    public void testMQConfirmCallback() throws InterruptedException {
+        // 创建CorrelationData
+        MyCorrelationData cd = new MyCorrelationData(UUID.randomUUID().toString(), "jackson.direct", "red", "hello", 0);
+        // 给Future添加ConfirmCallback
+        rabbitTemplate.convertAndSend("jackson.direct", "red10", "hello", cd);
+        Thread.sleep(2000);
+    }
+
+    @Test
+    public void testPageOut() {
+        // 测试发送大量非持久化消息到mq后因内存堵塞导致消息pageOut
+        // spring发送mq消息默认是持久化的
+        Message message = MessageBuilder.withBody("hello".getBytes(StandardCharsets.UTF_8))
+                .setDeliveryMode(MessageDeliveryMode.NON_PERSISTENT) // 发送消息选择非持久化的方式
+                //.setDeliveryMode(MessageDeliveryMode.PERSISTENT) // 发送消息选择持久化到磁盘
+                .build();
+        for (int i = 0; i < 1000000; i++) {
+            rabbitTemplate.send("lazy.queue", message);
+        }
     }
 }
